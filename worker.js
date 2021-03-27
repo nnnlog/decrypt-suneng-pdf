@@ -7,14 +7,14 @@ pdftk.configure({
 	ignoreWarnings: true,
 });
 
-parentPort.on('message', async ({port, filepath, realpath}) => {
+parentPort.on('message', async ({port, filename, realpath}) => {
 	let data = await pdftk.input(fs.readFileSync(realpath)).uncompress().output();
 
 	data = replace(data, Buffer.from("/ExportState /ON"), Buffer.from("/ExportState /OFF"));
 	data = replace(data, Buffer.from("/ViewState /ON"), Buffer.from("/ViewState /OFF"));
 	data = replace(data, Buffer.from("/PrintState /ON"), Buffer.from("/PrintState /OFF"));
-	fs.writeFileSync(`${__dirname}/dist/${filepath}`, data);
+	fs.writeFileSync(`${__dirname}/dist/${filename}`, data);
 
-	ps.push(pdftk.input(data).compress().output(false, `${__dirname}/dist/${filepath}`));
+	ps.push(pdftk.input(data).compress().output(false, `${__dirname}/dist/${filename}`));
 	port.postMessage("");
 });
